@@ -1,0 +1,17 @@
+services:
+  pygeoapi:
+    container_name: pygeoapi
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+    platform: linux/amd64
+    ports:
+      - "${PYGEOAPI_PORT}:${PYGEOAPI_PORT}"
+    env_file:
+      - .env-default
+      - .env
+    volumes:
+      - ./config.yml:/etc/pygeoapi/config.yml:ro
+    restart: unless-stopped

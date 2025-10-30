@@ -1,0 +1,9 @@
+.venv
+aws
+.env
+.env-default
+.gitignore
+docker-compose.yml
+Dockerfile
+run.sh
+pygeoapi-config.json
