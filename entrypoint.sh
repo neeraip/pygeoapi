@@ -20,29 +20,21 @@ if [ -z "$PYGEOAPI_OPENAPI" ]; then
     exit 1
 fi
 
-# Determine the URL based on environment
-if [ -n "$ECS_CONTAINER_METADATA_URI_V4" ]; then
-    echo "Running in ECS, getting public IP address..."
-    # Try to get public IP using AWS metadata service (works if task has public IP)
-    PUBLIC_IP=$(curl -s --max-time 5 http://169.254.169.254/latest/meta-data/public-ipv4 2>/dev/null)
-    
-    if [ -n "$PUBLIC_IP" ] && [ "$PUBLIC_IP" != "404" ]; then
-        PYGEOAPI_URL="http://${PUBLIC_IP}:${PYGEOAPI_PORT}"
-        echo "Using ECS public IP URL: $PYGEOAPI_URL"
-    else
-        echo "Could not get public IP, falling back to configured domain..."
-        # Fallback to a configured domain or load balancer URL
-        if [ -n "$PYGEOAPI_DOMAIN" ]; then
-            PYGEOAPI_URL="http://${PYGEOAPI_DOMAIN}:${PYGEOAPI_PORT}"
-            echo "Using configured domain URL: $PYGEOAPI_URL"
-        else
-            echo "Warning: No public IP or domain configured, using localhost"
-            PYGEOAPI_URL="http://localhost:${PYGEOAPI_PORT}"
-        fi
-    fi
+# Determine the URL - use configured domain first, then try public IP, fallback to localhost
+if [ -n "$PYGEOAPI_DOMAIN" ]; then
+    PYGEOAPI_URL="http://${PYGEOAPI_DOMAIN}:${PYGEOAPI_PORT}"
+    echo "Using configured domain URL: $PYGEOAPI_URL"
 else
-    PYGEOAPI_URL="http://localhost:${PYGEOAPI_PORT}"
-    echo "Using localhost URL: $PYGEOAPI_URL"
+    echo "No domain configured, getting public IP address..."
+    PUBLIC_IP=$(curl -s --max-time 10 ipv4.icanhazip.com)
+    
+    if [ -n "$PUBLIC_IP" ]; then
+        PYGEOAPI_URL="http://${PUBLIC_IP}:${PYGEOAPI_PORT}"
+        echo "Using public IP URL: $PYGEOAPI_URL"
+    else
+        echo "Warning: Could not get public IP, using localhost"
+        PYGEOAPI_URL="http://localhost:${PYGEOAPI_PORT}"
+    fi
 fi
 
 echo "Invoking Lambda to generate pygeoapi configuration: $LAMBDA_PYGEOAPI_CONFIG_GENERATOR"
