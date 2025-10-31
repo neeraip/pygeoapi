@@ -6,6 +6,9 @@ services:
       dockerfile: Dockerfile
       platforms:
         - linux/amd64
+      tags:
+        - pygeoapi:latest
+        - ${AWS_ECR_TAG}
     platform: linux/amd64
     ports:
       - "${PYGEOAPI_PORT}:${PYGEOAPI_PORT}"
