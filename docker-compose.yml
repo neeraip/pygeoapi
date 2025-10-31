@@ -12,6 +12,4 @@ services:
     env_file:
       - .env-default
       - .env
-    volumes:
-      - ./config.yml:/etc/pygeoapi/config.yml:ro
     restart: unless-stopped

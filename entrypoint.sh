@@ -31,5 +31,5 @@ jq -r '.body' /app/response.json > ${PYGEOAPI_CONFIG}
 echo "Generating OpenAPI specification at: $PYGEOAPI_OPENAPI"
 /venv/bin/pygeoapi openapi generate ${PYGEOAPI_CONFIG} --output-file ${PYGEOAPI_OPENAPI}
 
-echo "Starting pygeoapi server..."
-/venv/bin/gunicorn --bind 0.0.0.0:${PYGEOAPI_PORT} pygeoapi.flask_app:APP
+echo "Starting pygeoapi server with authentication..."
+cd /app && /venv/bin/gunicorn --bind 0.0.0.0:${PYGEOAPI_PORT} custom_flask_app:APP

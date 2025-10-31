@@ -14,13 +14,19 @@ RUN unzip awscliv2.zip -d /app && \
 
 # Create an isolated virtual environment and ensure pip is up-to-date
 RUN python3 -m venv /venv && /venv/bin/python3 -m pip install --upgrade pip
-
 COPY requirements.txt /app/requirements.txt
-
 RUN /venv/bin/python3 -m pip install --no-cache-dir -r /app/requirements.txt
+
+# Replace the default parquet.py with custom version
+COPY custom-parquet.py /venv/lib/python3.13/site-packages/pygeoapi/provider/parquet.py
+
+# Copy custom authentication and Flask app
+COPY custom-auth.py /app/custom_auth.py
+COPY custom-flask-app.py /app/custom_flask_app.py
 
 ENV PYGEOAPI_CONFIG=/app/config.yml
 ENV PYGEOAPI_OPENAPI=/app/openapi.yml
+ENV PYTHONPATH=/app:$PYTHONPATH
 
 COPY entrypoint.sh /app/entrypoint.sh
 
